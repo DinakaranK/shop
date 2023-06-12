@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>sample</title>
+    </head>
+    <link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
+    <style>
+        /* video container */
+        .videoContainer {
+        max-width: 300px;
+        position: relative;
+        margin: 20px auto 0;
+        }
+        .advertisement{
+            position:absolute;
+            color: rgb(230, 200, 98);
+            padding: 5px 10px;
+            text-align: right;
+            background: rgba(0, 0, 0, 0.4);
+            bottom: 50px;
+            right:0;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 1 !important;
+        }
+        .hide{
+            display:none;
+        }
+    </style>
+    <body>
+        <div class="videoContainer">
+            <!-- Add some extra attribute as video-url and mimetype which we can later play once we are done playing ads  -->
+            <!-- <video id="video_1" class="video-js playads" height="200px" width="300px" video-url="" mimetype="video/mp4" controls controlsList="nodownload" preload="none" data-setup=''> -->
+            <video id="video_1" class="video-js playads" style="height:500px;width:500px;" video-url="" mimetype="video/mp4" controls controlsList="nodownload" preload="none" data-setup=''>
+            <!-- ad source ad ad video url   -->
+            <source src="v1_trial_0.mp4" type='video/mp4' />
+            </video>
+            <!-- text to be displayed while playing ad   -->
+            <div class="moveToVideoJs">
+                <div class="advertisement hide"><a href="https://indiarailinfo.com/" id="add-dt">Link1</a></div>
+            </div>
+        </div>
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var videotag = $('.playads');
+                var myPlayer = videojs('video_1');
+                $(".moveToVideoJs").appendTo($('#video_1'));
+                // show advertisement label while play advertisement
+                myPlayer.on('play', function() {
+                    if(myPlayer.hasClass("playads")){
+                        $('.advertisement').removeClass('hide');
+                    }
+                });
+                // Stop from seeking while playing advertisement
+                myPlayer.on("seeking", function(event) {
+                    if (currentTime < myPlayer.currentTime() && myPlayer.hasClass("playads")) {
+                        myPlayer.currentTime(currentTime);
+                    }
+                });
+                myPlayer.on("seeked", function(event) {
+                    if (currentTime < myPlayer.currentTime() && myPlayer.hasClass("playads")) {
+                        myPlayer.currentTime(currentTime);
+                    }
+                });
+                setInterval(function() {
+                    if (!myPlayer.paused() && myPlayer.hasClass("playads")) {
+                        currentTime = myPlayer.currentTime();
+                    }
+                }, 1000);
+                
+                // Hide Advertisement label and change data-src of player to play actual video
+                myPlayer.on('ended', function() {
+                    if(this.hasClass("playads")){
+                this.src({type: videotag.attr('mimetype'), src: videotag.attr('video-url')});
+                        this.play();
+                        this.removeClass('playads');
+                        $('.advertisement').addClass('hide');
+                    }
+                });
+                setInterval(function() {
+                    $("#add-dt").html("Link2");
+                    $("#add-dt").attr("href", "https://www.irctc.co.in/nget/train-search");
+                }, 15000);
+        });
+    </script>
+</html>
